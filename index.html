@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SafeGuard Pakistan | Emergency Response Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ════════════════════════════════════
+     VIEW 1 — LANDING
+════════════════════════════════════ -->
+<div class="view active" id="view-landing">
+  <div class="landing-bg-grid"></div>
+  <div class="landing-glow"></div>
+  <div class="landing-inner">
+    <div class="landing-logo">🛡️</div>
+    <div class="landing-title">SAFE<span>GUARD</span><br>PAKISTAN</div>
+    <div class="landing-sub">Emergency Response Platform · Ministry of Interior<br>Select your role to continue</div>
+    <div class="landing-cards">
+      <div class="role-card citizen" onclick="openCitizenAuth()">
+        <div class="rc-icon">👤</div>
+        <div class="rc-title">CITIZEN</div>
+        <div class="rc-desc">Register or sign in to access emergency SOS, nearby services, and your safety dashboard</div>
+        <button class="rc-btn citizen">Enter Citizen App →</button>
+      </div>
+      <div class="role-card police" onclick="enterPoliceLogin()">
+        <div class="rc-icon">🚓</div>
+        <div class="rc-title">POLICE ACCESS</div>
+        <div class="rc-desc">Command center for police staff — register, login & manage live SOS alerts</div>
+        <button class="rc-btn police">Police Login →</button>
+      </div>
+    </div>
+    <div class="landing-footer">🇵🇰 GOVERNMENT OF PAKISTAN · MINISTRY OF INTERIOR · SAFEGUARD PAKISTAN v3.0</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     CITIZEN AUTH MODAL
+════════════════════════════════════ -->
+<div class="auth-modal-bg" id="citizen-auth-modal">
+  <div class="auth-modal">
+    <div class="auth-modal-header">
+      <div class="amh-icon">🛡️</div>
+      <div>
+        <div class="amh-title">CITIZEN ACCESS</div>
+        <div class="amh-sub">SafeGuard Pakistan — Ministry of Interior</div>
+      </div>
+    </div>
+    <button class="auth-modal-close" onclick="closeCitizenAuth()">✕</button>
+    <div class="auth-modal-body">
+      <div class="auth-tabs">
+        <div class="auth-tab active" id="c-tab-login" onclick="cSwitchAuthTab('login')">Sign In</div>
+        <div class="auth-tab" id="c-tab-register" onclick="cSwitchAuthTab('register')">Register</div>
+      </div>
+
+      <!-- Login Form -->
+      <div class="auth-form active" id="c-auth-login">
+        <div class="auth-alert error" id="c-login-err"></div>
+        <div class="auth-alert success" id="c-login-ok"></div>
+        <div class="af-group">
+          <label class="af-label">Phone Number</label>
+          <div class="af-input-wrap">
+            <span class="af-icon">📱</span>
+            <input class="af-input" id="c-li-phone" type="tel" placeholder="+92 3XX XXXXXXX">
+          </div>
+        </div>
+        <div class="af-group">
+          <label class="af-label">Password</label>
+          <div class="af-input-wrap">
+            <span class="af-icon">🔒</span>
+            <input class="af-input" id="c-li-pass" type="password" placeholder="Enter your password" onkeydown="if(event.key==='Enter')doCitizenLogin()">
+            <span class="af-eye" onclick="toggleEye('c-li-pass',this)">👁️</span>
+          </div>
+        </div>
+        <div style="text-align:right;margin-bottom:10px">
+          <span style="font-size:11px;color:var(--blue3);cursor:pointer;font-weight:600" onclick="cShowMsg('c-login-ok','📨 OTP sent to your registered number')">Forgot Password?</span>
+        </div>
+        <button class="btn-auth-main" onclick="doCitizenLogin()">🔓 Sign In →</button>
+        <div class="auth-divider">or quick access</div>
+        <div class="em-access-modal" onclick="closeCitizenAuth();showView('view-citizen');document.getElementById('c-bottom-nav').style.display='flex';cGoScreen('cs-panic');cTriggerSOS();">
+          <div style="font-size:20px">🚨</div>
+          <div style="font-size:11px;color:var(--red3);font-weight:600;line-height:1.4">Emergency? Access SOS without signing in</div>
+          <div style="font-size:15px;color:var(--red);margin-left:auto">›</div>
+        </div>
+      </div>
+
+      <!-- Register Form -->
+      <div class="auth-form" id="c-auth-register">
+        <div class="auth-alert error" id="c-reg-err"></div>
+        <div class="auth-alert success" id="c-reg-ok"></div>
+        <div class="af-row">
+          <div class="af-group">
+            <label class="af-label">First Name</label>
+            <div class="af-input-wrap">
+              <span class="af-icon">👤</span>
+              <input class="af-input" id="c-reg-fname" type="text" placeholder="Ahmed">
+            </div>
+          </div>
+          <div class="af-group">
+            <label class="af-label">Last Name</label>
+            <div class="af-input-wrap">
+              <span class="af-icon">👤</span>
+              <input class="af-input" id="c-reg-lname" type="text" placeholder="Raza">
+            </div>
+          </div>
+        </div>
+        <div class="af-group">
+          <label class="af-label">CNIC</label>
+          <div class="af-input-wrap">
+            <span class="af-icon">🪪</span>
+            <input class="af-input" id="c-reg-cnic" type="text" placeholder="XXXXX-XXXXXXX-X" maxlength="15" oninput="fmtCNIC(this)">
+          </div>
+        </div>
+        <div class="af-group">
+          <label class="af-label">Phone Number</label>
+          <div class="af-input-wrap">
+            <span class="af-icon">📱</span>
+            <input class="af-input" id="c-reg-phone" type="tel" placeholder="+92 3XX XXXXXXX">
+          </div>
+        </div>
+        <div class="af-group">
+          <label class="af-label">Password</label>
+          <div class="af-input-wrap">
+            <span class="af-icon">🔒</span>
+            <input class="af-input" id="c-reg-pass" type="password" placeholder="Min. 8 characters" oninput="checkStrength(this,'c-str')">
+            <span class="af-eye" onclick="toggleEye('c-reg-pass',this)">👁️</span>
+          </div>
+          <div class="af-strength" id="c-str">
+            <div class="af-strength-bar"><div class="af-strength-fill" id="c-str-fill"></div></div>
+            <div class="af-strength-text" id="c-str-text" style="color:var(--gray2)">Enter a password</div>
+          </div>
+        </div>
+        <div class="af-group">
+          <label class="af-label">Confirm Password</label>
+          <div class="af-input-wrap">
+            <span class="af-icon">🔒</span>
+            <input class="af-input" id="c-reg-pass2" type="password" placeholder="Re-enter password">
+            <span class="af-eye" onclick="toggleEye('c-reg-pass2',this)">👁️</span>
+          </div>
+        </div>
+        <button class="btn-auth-main" onclick="doCitizenRegister()">📝 Create Account →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     VIEW 2 — CITIZEN APP
+════════════════════════════════════ -->
+<div class="view" id="view-citizen">
+  <button class="citizen-back" onclick="goLanding()">← Back</button>
+  <div class="phone-frame">
+    <div class="notch"></div>
+    <div class="status-bar">
+      <span class="sb-time" id="c-clock">9:41</span>
+      <div style="display:flex;gap:5px">📶 🛜 🔋</div>
+    </div>
+    <div class="home-ind"></div>
+
+    <!-- Splash -->
+    <div class="cscreen active" id="cs-splash">
+      <div class="splash-glow"></div>
+      <div class="splash-emblem">🛡️</div>
+      <div class="splash-title">SAFE<span>GUARD</span><br>PAKISTAN</div>
+      <div class="splash-sub">YOUR SAFETY · ONE TAP AWAY</div>
+      <div class="splash-loader"><span></span><span></span><span></span></div>
+    </div>
+
+    <!-- Home -->
+    <div class="cscreen" id="cs-home">
+      <div class="c-header">
+        <div><div class="ch-greet">Good Morning 👋</div><div class="ch-name" id="c-user-display">Ahmed Raza</div></div>
+        <div class="ch-action" onclick="cShowAlert('🔔','Notifications','No new alerts.\n\nLast alert: 3 days ago.\nAll contacts active.')">🔔<div class="notif-dot">2</div></div>
+      </div>
+      <div class="safe-pill">
+        <div class="sp-dot"></div>
+        <span class="sp-text">You are safe</span>
+        <span class="sp-loc">· Karachi, PK</span>
+      </div>
+      <div class="sos-wrap">
+        <div class="sos-rings">
+          <div class="sos-ring"></div><div class="sos-ring"></div><div class="sos-ring"></div>
+          <div class="sos-btn" id="c-sos-btn" onmousedown="cStartSOS()" ontouchstart="cStartSOS()" onmouseup="cCancelSOS()" ontouchend="cCancelSOS()" onmouseleave="cCancelSOS()">
+            <div class="sos-label">SOS</div>
+            <div class="sos-sub">HOLD</div>
+          </div>
+        </div>
+        <div class="sos-hint">Press &amp; hold <strong style="color:var(--white)">3 seconds</strong><br>to send emergency alert</div>
+      </div>
+      <div class="quick-row">
+        <div class="qcard" onclick="cGoScreen('cs-nearby')"><div class="qcard-icon">📍</div><div class="qcard-label">Share Location</div></div>
+        <div class="qcard" onclick="cGoScreen('cs-nearby')"><div class="qcard-icon">🚓</div><div class="qcard-label">Find Police</div></div>
+        <div class="qcard" onclick="cGoScreen('cs-contacts')"><div class="qcard-icon">📞</div><div class="qcard-label">Contacts</div></div>
+      </div>
+      <div class="sc-card" onclick="cShowAlert('🛡️','Safety Score','Your safety score is 85/100.\n\n✅ Location sharing: Active\n✅ Emergency contacts: 3 added\n✅ App updated: v3.0\n⚠️ Shake-to-alert: Not enabled')">
+        <div class="sc-ring"><span class="sc-num">85</span></div>
+        <div class="sc-info"><div class="sc-title">Safety Score: Good</div><div class="sc-sub">Enable shake-to-alert to reach 100%</div></div>
+        <div style="font-size:15px;color:var(--gray2)">›</div>
+      </div>
+      <div class="sec-lbl">Nearby Services<a onclick="cGoScreen('cs-nearby')">See All →</a></div>
+      <div class="nearby-scroll">
+        <div class="ncard" onclick="cShowAlert('🚓','Saddar Police Station','M.A. Jinnah Road, Karachi\nPhone: 021-35601010\nDistance: 0.8 km\nStatus: Active ✅')"><div class="nc-icon">🚓</div><div class="nc-name">Saddar Police</div><div class="nc-dist">0.8 km</div><div class="nc-type">Police Station</div></div>
+        <div class="ncard" onclick="cShowAlert('🏥','Civil Hospital','Boulton Road, Karachi\nPhone: 021-99215740\nDistance: 1.2 km\nEmergency: Active ✅')"><div class="nc-icon">🏥</div><div class="nc-name">Civil Hospital</div><div class="nc-dist">1.2 km</div><div class="nc-type">Hospital</div></div>
+        <div class="ncard" onclick="cShowAlert('🚑','Edhi Centre','Saddar, Karachi\nPhone: 115\nDistance: 1.8 km')"><div class="nc-icon">🚑</div><div class="nc-name">Edhi Centre</div><div class="nc-dist">1.8 km</div><div class="nc-type">Ambulance</div></div>
+        <div class="ncard" onclick="cShowAlert('🔒','Rangers Checkpoint','M.A. Jinnah Road\nDistance: 2.4 km\nManned 24/7 ✅')"><div class="nc-icon">🔒</div><div class="nc-name">Rangers Post</div><div class="nc-dist">2.4 km</div><div class="nc-type">Checkpoint</div></div>
+      </div>
+    </div>
+
+    <!-- Panic -->
+    <div class="cscreen" id="cs-panic">
+      <div class="panic-hdr">
+        <div class="ph-row"><div class="ph-badge"><div class="ph-bdot"></div>EMERGENCY ACTIVE</div><button class="ph-cancel" onclick="cCancelAlert()">✕ Cancel</button></div>
+        <div class="ph-title">🚨 Alert Sent!</div>
+        <div class="ph-sub">Police &amp; contacts notified • Sharing location</div>
+      </div>
+      <div class="panic-map">
+        <div class="map-grid-overlay"></div>
+        <svg style="position:absolute;inset:0;width:100%;height:100%;opacity:.12" viewBox="0 0 350 220"><line x1="0" y1="110" x2="350" y2="110" stroke="#1fd45a" stroke-width="2"/><line x1="175" y1="0" x2="175" y2="220" stroke="#1fd45a" stroke-width="2"/></svg>
+        <div class="map-route-line"></div>
+        <div class="map-police-pin"><div class="police-dot">🚓</div></div>
+        <div class="map-pin-user"><div class="map-user-dot">📍</div></div>
+        <div class="map-eta">
+          <div><div style="font-size:9px;color:var(--gray1);letter-spacing:1px">POLICE ETA</div><div style="display:flex;align-items:baseline;gap:3px"><span class="eta-val" id="c-eta">4</span><span class="eta-unit">min</span></div></div>
+          <div style="width:1px;height:28px;background:var(--gray3)"></div>
+          <div><div style="font-size:9px;color:var(--gray1)">UNIT</div><div style="font-size:12px;font-weight:700;color:var(--white)">SGD-041</div></div>
+        </div>
+      </div>
+      <div class="panic-actions">
+        <button class="pa-btn pa-call" onclick="cToast('📞 Calling Police 15...')"><span class="pa-icon">📞</span><span class="pa-lbl">CALL 15</span></button>
+        <button class="pa-btn pa-video" onclick="cToast('🎥 Starting live stream...')"><span class="pa-icon">🎥</span><span class="pa-lbl">LIVE VIDEO</span></button>
+        <button class="pa-btn pa-share" onclick="cToast('📤 Location shared!')"><span class="pa-icon">📤</span><span class="pa-lbl">SHARE LOC</span></button>
+        <button class="pa-btn pa-contacts" onclick="cGoScreen('cs-contacts')"><span class="pa-icon">👥</span><span class="pa-lbl">CONTACTS</span></button>
+      </div>
+    </div>
+
+    <!-- Contacts -->
+    <div class="cscreen" id="cs-contacts">
+      <div class="c-header"><div><div class="ch-greet">Emergency</div><div class="ch-name">Contacts</div></div><div class="ch-action" onclick="cToast('➕ Add contact opening...')">➕</div></div>
+      <div class="cont-list">
+        <div class="cont-card"><div class="cont-av av-r">A</div><div class="cont-info"><div class="ci-name">Ahmed (Father)</div><div class="ci-rel">🏠 Family</div><div class="ci-num">+92 300 1234567</div></div><div class="ca-btns"><div class="ca-btn ca-call" onclick="cToast('📞 Calling Ahmed...')">📞</div><div class="ca-btn ca-del" onclick="cToast('🗑️ Removed')">🗑️</div></div></div>
+        <div class="cont-card"><div class="cont-av av-b">Z</div><div class="cont-info"><div class="ci-name">Zara Malik</div><div class="ci-rel">👫 Friend</div><div class="ci-num">+92 321 9876543</div></div><div class="ca-btns"><div class="ca-btn ca-call" onclick="cToast('📞 Calling Zara...')">📞</div><div class="ca-btn ca-del" onclick="cToast('🗑️ Removed')">🗑️</div></div></div>
+        <div class="cont-card"><div class="cont-av av-g">K</div><div class="cont-info"><div class="ci-name">Uncle Kamran</div><div class="ci-rel">🛡️ Guardian</div><div class="ci-num">+92 333 5551234</div></div><div class="ca-btns"><div class="ca-btn ca-call" onclick="cToast('📞 Calling Kamran...')">📞</div><div class="ca-btn ca-del" onclick="cToast('🗑️ Removed')">🗑️</div></div></div>
+        <div class="cont-card"><div class="cont-av av-y">S</div><div class="cont-info"><div class="ci-name">Sara (Sister)</div><div class="ci-rel">👩‍👧 Family</div><div class="ci-num">+92 311 4445678</div></div><div class="ca-btns"><div class="ca-btn ca-call" onclick="cToast('📞 Calling Sara...')">📞</div><div class="ca-btn ca-del" onclick="cToast('🗑️ Removed')">🗑️</div></div></div>
+        <div class="add-cont-btn" onclick="cToast('➕ Add contact...')">➕ &nbsp;Add Emergency Contact</div>
+      </div>
+    </div>
+
+    <!-- Nearby -->
+    <div class="cscreen" id="cs-nearby">
+      <div class="c-header"><div><div class="ch-greet">Near You</div><div class="ch-name">Safe Places</div></div><div class="ch-action" onclick="cToast('🗺️ Full map view...')">🗺️</div></div>
+      <div class="search-bar-c"><span style="font-size:16px">🔍</span><input class="sbc-input" placeholder="Search police, hospitals…"></div>
+      <div class="nearby-map-view">
+        <div class="nearby-map-grid"></div>
+        <div class="map-place" style="top:28%;left:22%" onclick="cToast('🚓 Saddar Police — 0.8km')">🚓</div>
+        <div class="map-place" style="top:55%;left:62%" onclick="cToast('🏥 Civil Hospital — 1.2km')">🏥</div>
+        <div class="map-place" style="top:20%;left:65%" onclick="cToast('🚑 Edhi Centre — 1.8km')">🚑</div>
+        <div class="user-dot"></div>
+      </div>
+      <div class="nearby-list-c">
+        <div class="ni-c"><div class="nic-icon nic-p">🚓</div><div class="nic-info"><div class="nic-name">Saddar Police Station</div><div class="nic-addr">M.A. Jinnah Road, Karachi</div></div><div><div class="nic-dist">0.8</div><div class="nic-km">km</div></div></div>
+        <div class="ni-c"><div class="nic-icon nic-h">🏥</div><div class="nic-info"><div class="nic-name">Civil Hospital Karachi</div><div class="nic-addr">Boulton Road, Karachi</div></div><div><div class="nic-dist">1.2</div><div class="nic-km">km</div></div></div>
+        <div class="ni-c"><div class="nic-icon nic-r">🚑</div><div class="nic-info"><div class="nic-name">Edhi Ambulance Centre</div><div class="nic-addr">Saddar, Karachi</div></div><div><div class="nic-dist">1.8</div><div class="nic-km">km</div></div></div>
+      </div>
+    </div>
+
+    <!-- Profile -->
+    <div class="cscreen" id="cs-profile">
+      <div class="c-header"><div><div class="ch-greet">My Account</div><div class="ch-name">Profile</div></div><div class="ch-action" onclick="cToast('✏️ Edit profile...')">✏️</div></div>
+      <div class="prof-hero"><div class="prof-pic" id="c-prof-pic">AR</div><div><div class="pp-name" id="c-prof-name">Ahmed Raza</div><div class="pp-cnic" id="c-prof-cnic">42201-1234567-1</div><div class="pp-badge">✅ NADRA Verified</div></div></div>
+      <div class="sett-sec">
+        <div class="sett-sec-title">Safety Features</div>
+        <div class="sett-item"><div class="si-ico" style="background:rgba(232,25,44,.15)">📳</div><div class="si-txt"><div class="si-title">Shake to Alert</div><div class="si-sub">Shake to trigger SOS</div></div><div class="toggle on" onclick="cFlipToggle(this)"><div class="tgl-dot"></div></div></div>
+        <div class="sett-item"><div class="si-ico" style="background:rgba(31,212,90,.12)">🎙️</div><div class="si-txt"><div class="si-title">Voice Distress AI</div><div class="si-sub">Auto-SOS on keywords</div></div><div class="toggle on" onclick="cFlipToggle(this)"><div class="tgl-dot"></div></div></div>
+        <div class="sett-item"><div class="si-ico" style="background:rgba(26,74,138,.2)">🔒</div><div class="si-txt"><div class="si-title">Lock Screen SOS</div><div class="si-sub">Alert without unlocking</div></div><div class="toggle on" onclick="cFlipToggle(this)"><div class="tgl-dot"></div></div></div>
+        <div class="sett-item"><div class="si-ico" style="background:rgba(245,200,66,.1)">📍</div><div class="si-txt"><div class="si-title">Always Share Location</div><div class="si-sub">Live GPS to contacts</div></div><div class="toggle off" onclick="cFlipToggle(this)"><div class="tgl-dot"></div></div></div>
+      </div>
+      <div class="sett-sec" style="margin-top:14px">
+        <div class="sett-sec-title">Account</div>
+        <div class="sett-item" onclick="cToast('📱 Change phone number...')"><div class="si-ico" style="background:rgba(26,74,138,.2)">📱</div><div class="si-txt"><div class="si-title">Phone Number</div><div class="si-sub" id="c-prof-phone">+92 300 1234567</div></div><div class="si-arr">›</div></div>
+        <div class="sett-item" onclick="cToast('🔑 Change password...')"><div class="si-ico" style="background:rgba(232,25,44,.12)">🔑</div><div class="si-txt"><div class="si-title">Change Password</div><div class="si-sub">Last changed today</div></div><div class="si-arr">›</div></div>
+        <div class="sett-item" onclick="cNavTo('contacts')"><div class="si-ico" style="background:rgba(31,212,90,.1)">👥</div><div class="si-txt"><div class="si-title">Emergency Contacts</div><div class="si-sub">4 contacts added</div></div><div class="si-arr">›</div></div>
+      </div>
+      <div class="logout-btn" onclick="cDoLogout()">🚪 &nbsp;Sign Out</div>
+      <div style="height:28px"></div>
+    </div>
+
+    <!-- Bottom Nav -->
+    <div class="c-bottom-nav" id="c-bottom-nav" style="display:none">
+      <div class="c-nav-btn active" id="c-nav-home" onclick="cNavTo('home')"><span class="c-nav-icon">🏠</span><span class="c-nav-label">Home</span></div>
+      <div class="c-nav-btn" id="c-nav-nearby" onclick="cNavTo('nearby')"><span class="c-nav-icon">📍</span><span class="c-nav-label">Nearby</span></div>
+      <div class="c-nav-btn" id="c-nav-sos" onclick="cTriggerSOS()"><span class="c-nav-icon" style="font-size:30px">🔴</span><span class="c-nav-label" style="color:var(--red)">SOS</span></div>
+      <div class="c-nav-btn" id="c-nav-contacts" onclick="cNavTo('contacts')"><span class="c-nav-icon">👥</span><span class="c-nav-label">Contacts</span></div>
+      <div class="c-nav-btn" id="c-nav-profile" onclick="cNavTo('profile')"><span class="c-nav-icon">👤</span><span class="c-nav-label">Profile</span></div>
+    </div>
+
+    <!-- Alert Overlay -->
+    <div class="c-alert-overlay" id="c-alert-overlay">
+      <div class="cao-icon" id="cao-icon">💬</div>
+      <div class="cao-title" id="cao-title">Notice</div>
+      <div class="cao-sub" id="cao-sub"></div>
+      <button class="cao-btn" id="cao-btn" onclick="cCloseAlert()">OK</button>
+      <button class="cao-btn-sec" id="cao-btn-sec" onclick="cCloseAlert()" style="display:none">Close</button>
+    </div>
+    <div class="c-toast" id="c-toast"><span id="c-toast-msg"></span></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     VIEW 3 — POLICE LOGIN
+════════════════════════════════════ -->
+<div class="view" id="view-police-login">
+  <div class="landing-bg-grid"></div>
+  <div class="police-login-card">
+    <div class="plc-header">
+      <div class="plc-emblem">🚓</div>
+      <div class="plc-title">POLICE ACCESS</div>
+      <div class="plc-sub">SafeGuard Pakistan Command Center</div>
+    </div>
+    <div class="plc-tabs">
+      <div class="plc-tab active" id="p-tab-login" onclick="pSwitchTab('login')">Sign In</div>
+      <div class="plc-tab" id="p-tab-register" onclick="pSwitchTab('register')">Register Officer</div>
+    </div>
+
+    <!-- Police Login -->
+    <div class="plc-form active" id="p-form-login">
+      <div class="plc-alert error" id="p-login-err"></div>
+      <div class="plc-alert success" id="p-login-ok"></div>
+      <div class="plc-field">
+        <label class="plc-label">Email / Username</label>
+        <div class="plc-input-wrap">
+          <span class="plc-input-icon">📧</span>
+          <input class="plc-input" type="text" id="plc-user" placeholder="officer@safeguard.pk" onkeydown="if(event.key==='Enter')doPoliceLogin()">
+        </div>
+      </div>
+      <div class="plc-field">
+        <label class="plc-label">Password</label>
+        <div class="plc-input-wrap">
+          <span class="plc-input-icon">🔒</span>
+          <input class="plc-input" type="password" id="plc-pass" placeholder="Enter password" onkeydown="if(event.key==='Enter')doPoliceLogin()">
+          <span class="plc-input-eye" onclick="toggleEye('plc-pass',this)">👁️</span>
+        </div>
+      </div>
+      <div style="background:rgba(232,25,44,.07);border:1px solid rgba(232,25,44,.2);border-radius:10px;padding:12px 14px;margin-bottom:16px;">
+        <div style="font-size:10px;font-weight:700;color:var(--red3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">🔑 Demo Credentials — Click to Fill</div>
+        <div style="font-size:11px;color:var(--gray1);cursor:pointer;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05)" onclick="fillCreds('admin@safeguard.pk','SG-Admin#2025')">Super Admin · <span style="color:var(--blue3)">admin@safeguard.pk → click</span></div>
+        <div style="font-size:11px;color:var(--gray1);cursor:pointer;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05)" onclick="fillCreds('operator@safeguard.pk','Police@123')">Police Operator · <span style="color:var(--blue3)">operator@safeguard.pk → click</span></div>
+        <div style="font-size:11px;color:var(--gray1);cursor:pointer;padding:4px 0" onclick="fillCreds('dispatch@safeguard.pk','Dispatch#786')">Dispatch Officer · <span style="color:var(--blue3)">dispatch@safeguard.pk → click</span></div>
+      </div>
+      <button class="btn-police-main" onclick="doPoliceLogin()">🚓 Access Command Center</button>
+      <button class="btn-police-back" onclick="goLanding()">← Back to Role Selection</button>
+    </div>
+
+    <!-- Police Register -->
+    <div class="plc-form" id="p-form-register">
+      <div class="plc-alert error" id="p-reg-err"></div>
+      <div class="plc-alert success" id="p-reg-ok"></div>
+      <div class="plc-row">
+        <div class="plc-field">
+          <label class="plc-label">First Name</label>
+          <div class="plc-input-wrap">
+            <span class="plc-input-icon">👮</span>
+            <input class="plc-input" id="p-reg-fname" type="text" placeholder="First Name">
+          </div>
+        </div>
+        <div class="plc-field">
+          <label class="plc-label">Last Name</label>
+          <div class="plc-input-wrap">
+            <span class="plc-input-icon">👮</span>
+            <input class="plc-input" id="p-reg-lname" type="text" placeholder="Last Name">
+          </div>
+        </div>
+      </div>
+      <div class="plc-field">
+        <label class="plc-label">Badge / Officer ID</label>
+        <div class="plc-input-wrap">
+          <span class="plc-input-icon">🪪</span>
+          <input class="plc-input" id="p-reg-badge" type="text" placeholder="SGD-XXX or Badge No.">
+        </div>
+      </div>
+      <div class="plc-field">
+        <label class="plc-label">Rank</label>
+        <div class="plc-input-wrap">
+          <span class="plc-input-icon">⭐</span>
+          <select class="plc-input" id="p-reg-rank" style="padding-left:40px;cursor:pointer;">
+            <option value="">Select Rank</option>
+            <option>Constable</option>
+            <option>Head Constable</option>
+            <option>ASI (Asst. Sub-Inspector)</option>
+            <option>SI (Sub-Inspector)</option>
+            <option>Inspector</option>
+            <option>DSP (Dy. Superintendent)</option>
+            <option>SP (Superintendent)</option>
+            <option>Dispatch Officer</option>
+            <option>Super Admin</option>
+          </select>
+        </div>
+      </div>
+      <div class="plc-field">
+        <label class="plc-label">Official Email</label>
+        <div class="plc-input-wrap">
+          <span class="plc-input-icon">📧</span>
+          <input class="plc-input" id="p-reg-email" type="email" placeholder="officer@safeguard.pk">
+        </div>
+      </div>
+      <div class="plc-field">
+        <label class="plc-label">Password</label>
+        <div class="plc-input-wrap">
+          <span class="plc-input-icon">🔒</span>
+          <input class="plc-input" id="p-reg-pass" type="password" placeholder="Min. 8 characters" oninput="checkStrength(this,'p-str')">
+          <span class="plc-input-eye" onclick="toggleEye('p-reg-pass',this)">👁️</span>
+        </div>
+        <div class="af-strength" id="p-str" style="margin-top:6px">
+          <div class="af-strength-bar"><div class="af-strength-fill" id="p-str-fill"></div></div>
+          <div class="af-strength-text" id="p-str-text" style="color:var(--gray2)">Enter a password</div>
+        </div>
+      </div>
+      <div class="plc-field">
+        <label class="plc-label">Confirm Password</label>
+        <div class="plc-input-wrap">
+          <span class="plc-input-icon">🔒</span>
+          <input class="plc-input" id="p-reg-pass2" type="password" placeholder="Re-enter password">
+          <span class="plc-input-eye" onclick="toggleEye('p-reg-pass2',this)">👁️</span>
+        </div>
+      </div>
+      <button class="btn-police-main" onclick="doPoliceRegister()">📝 Register Officer →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     VIEW 4 — POLICE DASHBOARD
+════════════════════════════════════ -->
+<div class="view" id="view-police-dashboard">
+  <div class="alert-flash-overlay" id="alert-flash"></div>
+
+  <!-- Sidebar -->
+  <div class="pd-sidebar">
+    <div class="pds-logo">🛡️</div>
+    <div class="pds-btn active" id="sb-overview" onclick="pdSection('overview')">
+      📊<div class="pds-tooltip">Overview</div>
+      <div class="pds-badge" id="alert-badge">0</div>
+    </div>
+    <div class="pds-btn" id="sb-map" onclick="pdSection('map')">
+      🗺️<div class="pds-tooltip">Live Map</div>
+    </div>
+    <div class="pds-btn" id="sb-logs" onclick="pdSection('logs')">
+      📋<div class="pds-tooltip">Incident Logs</div>
+    </div>
+    <div class="pds-btn" id="sb-officers" onclick="pdSection('officers')">
+      👮<div class="pds-tooltip">Officers</div>
+    </div>
+    <div class="pds-divider"></div>
+    <div class="pds-btn" onclick="pdToast('⚙️ Settings panel opening...')">⚙️<div class="pds-tooltip">Settings</div></div>
+    <div class="pds-btn" onclick="exportLogs()">📤<div class="pds-tooltip">Export Logs</div></div>
+    <div class="pds-logout" onclick="doPoliceLogout()">🚪<div class="pds-tooltip">Logout</div></div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="pd-main">
+    <!-- Top Bar -->
+    <div class="pd-topbar">
+      <div class="ptb-section-name" id="pd-section-title">OVERVIEW</div>
+      <div class="ptb-alert-flash">
+        <div class="ptb-af-dot"></div>
+        <span class="ptb-af-text" id="pd-system-status">SYSTEM ACTIVE</span>
+      </div>
+      <div class="ptb-spacer"></div>
+      <div class="pd-search-wrap">
+        <span style="font-size:13px">🔍</span>
+        <input class="pd-search-input" id="pd-search" placeholder="Search alerts, citizens…" oninput="pdSearch(this.value)">
+      </div>
+      <div class="ptb-clock" id="pd-clock">00:00:00</div>
+      <div class="ptb-officer">
+        <div class="ptb-av" id="ptb-av">A</div>
+        <div><div class="ptb-name" id="ptb-name">Loading…</div><div class="ptb-role" id="ptb-role">Officer</div></div>
+      </div>
+    </div>
+
+    <!-- OVERVIEW -->
+    <div class="pd-section active" id="pds-overview">
+      <div class="pd-body">
+        <!-- Stats -->
+        <div class="stats-grid">
+          <div class="stat-card-p s-red">
+            <div class="scp-bg">🚨</div><div class="scp-icon">🚨</div>
+            <div class="scp-val" id="stat-active">0</div>
+            <div class="scp-label">Active Alerts</div>
+            <div class="scp-change text-red" id="stat-active-ch">↑ Live</div>
+          </div>
+          <div class="stat-card-p s-green">
+            <div class="scp-bg">✅</div><div class="scp-icon">✅</div>
+            <div class="scp-val" id="stat-resolved">12</div>
+            <div class="scp-label">Resolved Today</div>
+            <div class="scp-change text-green">↑ 34% faster</div>
+          </div>
+          <div class="stat-card-p s-blue">
+            <div class="scp-bg">🚓</div><div class="scp-icon">🚓</div>
+            <div class="scp-val">6</div>
+            <div class="scp-label">Units On Patrol</div>
+            <div class="scp-change text-cyan">3 responding</div>
+          </div>
+          <div class="stat-card-p s-gold">
+            <div class="scp-bg">⚡</div><div class="scp-icon">⚡</div>
+            <div class="scp-val" id="stat-response">4.2m</div>
+            <div class="scp-label">Avg Response Time</div>
+            <div class="scp-change text-gold">Best this month</div>
+          </div>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="ov-grid">
+          <!-- LEFT: Alert Panel -->
+          <div class="alert-panel">
+            <div class="panel-header">
+              <div class="panel-title"><div class="panel-title-dot"></div>LIVE ALERTS</div>
+              <div class="panel-actions">
+                <button class="panel-btn" onclick="filterAlerts(null)">All</button>
+                <button class="panel-btn" onclick="filterAlerts('Pending')">Pending</button>
+                <button class="panel-btn" onclick="filterAlerts('Dispatched')">Active</button>
+                <button class="panel-btn red" onclick="simulateNewAlert()">+ Simulate SOS</button>
+              </div>
+            </div>
+            <div class="alerts-list" id="alerts-list">
+              <div class="alerts-empty">
+                <div>📡</div>
+                <div>No alerts yet. Send SOS from Citizen app or click Simulate SOS.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT: Map + Units -->
+          <div class="right-panel">
+            <div class="pd-map">
+              <div class="pd-map-grid"></div>
+              <svg style="position:absolute;inset:0;width:100%;height:100%;opacity:.08" viewBox="0 0 340 180"><line x1="0" y1="90" x2="340" y2="90" stroke="#1fd45a" stroke-width="2"/><line x1="170" y1="0" x2="170" y2="180" stroke="#1fd45a" stroke-width="2"/><line x1="85" y1="0" x2="85" y2="180" stroke="#1fd45a" stroke-width="1"/><line x1="255" y1="0" x2="255" y2="180" stroke="#1fd45a" stroke-width="1"/></svg>
+              <div class="pd-map-title">LIVE MAP — KARACHI</div>
+              <div class="map-unit-pin" style="top:22%;left:26%" title="SGD-041">🚓</div>
+              <div class="map-unit-pin" style="top:58%;left:64%" title="SGD-078">🚓</div>
+              <div class="map-unit-pin" style="top:36%;left:78%" title="SGD-023">🚓</div>
+              <div id="map-alert-pins"></div>
+              <div class="map-legend">
+                <div class="ml-item"><div class="ml-dot" style="background:var(--red)"></div>Alert</div>
+                <div class="ml-item"><div class="ml-dot" style="background:var(--blue)"></div>Unit</div>
+              </div>
+            </div>
+            <div class="units-panel">
+              <div class="panel-title"><div class="panel-title-dot" style="background:var(--green)"></div>ACTIVE UNITS</div>
+              <div class="units-list">
+                <div class="unit-card"><div class="unit-status-dot usd-responding"></div><div class="unit-id">SGD-041</div><div class="unit-info"><div class="unit-officer">SI Ahmed Khan</div><div class="unit-status">Responding</div></div><div class="unit-eta">ETA 4m</div></div>
+                <div class="unit-card"><div class="unit-status-dot usd-standby"></div><div class="unit-id">SGD-078</div><div class="unit-info"><div class="unit-officer">ASI Bilal Raza</div><div class="unit-status">Standby — Saddar</div></div><div class="unit-eta" style="color:var(--gold)">Ready</div></div>
+                <div class="unit-card"><div class="unit-status-dot usd-available"></div><div class="unit-id">SGD-023</div><div class="unit-info"><div class="unit-officer">Cst. Kamran Ali</div><div class="unit-status">Available — DHA</div></div><div class="unit-eta" style="color:var(--green)">Free</div></div>
+                <div class="unit-card"><div class="unit-status-dot usd-responding"></div><div class="unit-id">SGD-055</div><div class="unit-info"><div class="unit-officer">SI Farrukh Naz</div><div class="unit-status">Responding</div></div><div class="unit-eta">ETA 7m</div></div>
+                <div class="unit-card"><div class="unit-status-dot usd-standby"></div><div class="unit-id">SGD-090</div><div class="unit-info"><div class="unit-officer">ASI Sana Mir</div><div class="unit-status">Standby — SITE</div></div><div class="unit-eta" style="color:var(--gold)">Ready</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LIVE MAP -->
+    <div class="pd-section" id="pds-map">
+      <div class="fullmap-wrap">
+        <div class="fullmap-grid"></div>
+        <svg style="position:absolute;inset:0;width:100%;height:100%;opacity:.07" viewBox="0 0 1200 700">
+          <line x1="0" y1="350" x2="1200" y2="350" stroke="#1fd45a" stroke-width="2"/><line x1="600" y1="0" x2="600" y2="700" stroke="#1fd45a" stroke-width="2"/>
+          <line x1="0" y1="175" x2="1200" y2="175" stroke="#1fd45a" stroke-width="1"/><line x1="0" y1="525" x2="1200" y2="525" stroke="#1fd45a" stroke-width="1"/>
+          <line x1="300" y1="0" x2="300" y2="700" stroke="#1fd45a" stroke-width="1"/><line x1="900" y1="0" x2="900" y2="700" stroke="#1fd45a" stroke-width="1"/>
+          <text x="10" y="30" fill="rgba(255,255,255,.15)" font-size="11" font-family="JetBrains Mono">KARACHI CENTRAL</text>
+          <text x="320" y="30" fill="rgba(255,255,255,.15)" font-size="11" font-family="JetBrains Mono">SADDAR ZONE</text>
+          <text x="620" y="30" fill="rgba(255,255,255,.15)" font-size="11" font-family="JetBrains Mono">EAST ZONE</text>
+          <text x="920" y="30" fill="rgba(255,255,255,.15)" font-size="11" font-family="JetBrains Mono">CLIFTON ZONE</text>
+          <text x="10" y="370" fill="rgba(255,255,255,.15)" font-size="11" font-family="JetBrains Mono">SITE AREA</text>
+          <text x="320" y="370" fill="rgba(255,255,255,.15)" font-size="11" font-family="JetBrains Mono">GULSHAN</text>
+          <text x="620" y="370" fill="rgba(255,255,255,.15)" font-size="11" font-family="JetBrains Mono">MALIR</text>
+          <text x="920" y="370" fill="rgba(255,255,255,.15)" font-size="11" font-family="JetBrains Mono">DHA / DEFENCE</text>
+        </svg>
+        <div class="heat-blob" style="width:200px;height:200px;background:rgba(232,25,44,.15);top:10%;left:25%;"></div>
+        <div class="heat-blob" style="width:150px;height:150px;background:rgba(232,25,44,.1);top:50%;left:55%;"></div>
+        <div class="heat-blob" style="width:100px;height:100px;background:rgba(245,200,66,.12);top:30%;left:70%;"></div>
+        <div style="position:absolute;top:20%;left:28%;font-size:20px;cursor:pointer" onclick="pdToast('🚓 SGD-041 — Responding')">🚓</div>
+        <div style="position:absolute;top:60%;left:62%;font-size:20px;cursor:pointer" onclick="pdToast('🚓 SGD-078 — Standby')">🚓</div>
+        <div style="position:absolute;top:35%;left:82%;font-size:20px;cursor:pointer" onclick="pdToast('🚓 SGD-023 — Available')">🚓</div>
+        <div style="position:absolute;top:70%;left:18%;font-size:20px;cursor:pointer" onclick="pdToast('🚓 SGD-055 — Responding')">🚓</div>
+        <div id="fullmap-pins"></div>
+        <div class="fullmap-controls">
+          <div class="fmc-btn" onclick="pdToast('🔍 Zoom in')">+</div>
+          <div class="fmc-btn" onclick="pdToast('🔍 Zoom out')">−</div>
+          <div class="fmc-btn" onclick="pdToast('📍 Centered')">⊕</div>
+          <div class="fmc-btn" onclick="pdToast('🔥 Heatmap toggled')">🔥</div>
+        </div>
+        <div class="fullmap-legend">
+          <div class="fml-title">Map Legend</div>
+          <div class="fml-item"><div class="fml-dot" style="background:var(--red)"></div>Active SOS</div>
+          <div class="fml-item"><div class="fml-dot" style="background:var(--gold)"></div>Pending</div>
+          <div class="fml-item"><div class="fml-dot" style="background:var(--green)"></div>Resolved</div>
+          <div class="fml-item"><div class="fml-dot" style="background:var(--blue3)"></div>Police Unit</div>
+          <div class="fml-item"><div class="fml-dot" style="background:rgba(232,25,44,.4)"></div>Heat Zone</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INCIDENT LOGS -->
+    <div class="pd-section" id="pds-logs">
+      <div class="logs-wrap">
+        <div class="logs-header">
+          <div class="logs-filters">
+            <button class="lf-btn active" onclick="logFilter('all',this)">All</button>
+            <button class="lf-btn" onclick="logFilter('high',this)">🔴 High</button>
+            <button class="lf-btn" onclick="logFilter('medium',this)">🟡 Medium</button>
+            <button class="lf-btn" onclick="logFilter('resolved',this)">✅ Resolved</button>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <div class="logs-search"><span style="font-size:14px">🔍</span><input class="ls-input" placeholder="Search logs…" oninput="logSearch(this.value)"></div>
+            <button class="panel-btn" onclick="exportLogs()">📤 Export CSV</button>
+          </div>
+        </div>
+        <div class="logs-table-wrap">
+          <table class="logs-table">
+            <thead>
+              <tr><th>Incident ID</th><th>Date &amp; Time</th><th>Citizen</th><th>Location</th><th>Priority</th><th>Officer</th><th>Response</th><th>Status</th></tr>
+            </thead>
+            <tbody id="logs-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- OFFICERS -->
+    <div class="pd-section" id="pds-officers">
+      <div class="officers-wrap">
+        <div class="officers-grid" id="officers-grid"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Global Police Notifications -->
+<div class="police-notif" id="police-notif"></div>
+<div class="police-toast" id="police-toast"></div>
+<div class="session-warning" id="session-warning">
+  ⏱️ Session expires in <strong id="session-countdown">5:00</strong> —
+  <span style="cursor:pointer;text-decoration:underline" onclick="resetSession()">Stay logged in</span>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
